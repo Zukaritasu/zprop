@@ -48,12 +48,22 @@ typedef struct
 		errno_t openError; \
 		zPropError error = zProp_OK; \
 		if ((openError = wtf(&file, filename, _O_WRONLY | _O_TRUNC | _O_CREAT, _SH_DENYNO, _S_IWRITE)) == 0) { \
-			_zPropWrite(props, &error, file); \
+			_zPropWrite(props, file); \
 		} \
 		if (openError != 0) { \
 			error = zProp_UNKNOWN; \
 		} \
 		return error;
+
+#define SYNTAX_ERROR \
+		*error = zProp_SYNTAX; \
+		zFreeProp(*props); \
+		break;
+
+#define OUTOFMEMORY_ERROR \
+		*error = zProp_OUTOFMEMORY; \
+		zFreeProp(*props); \
+		break;
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -91,8 +101,8 @@ _zReturn_(bool) zContainsKey(zProp props, zText key)
 */
 _zReturn_(bool) zRemoveKey(zProp props, zText key)
 {
-	DECLARE_LV(props);
 	if (props != NULL && key != NULL && zContainsKey(props, key)) {
+		DECLARE_LV(props);
 		for (int i = 1; i < _props_->count; i += 2) {
 			if (strcmp(_props_->props[i - 1], key) == 0) {
 				/* se libera la memoria usada por la clave y el valor */
@@ -138,8 +148,8 @@ _zReturn_(void) zFreeProp(zProp props)
 */
 _zReturn_(zText) zGetValue(zProp props, zText key)
 {
-	DECLARE_LV(props);
 	if (props != NULL && key != NULL) {
+		DECLARE_LV(props);
 		for (int i = 1; i < _props_->count; i += 2) {
 			if (strcmp(_props_->props[i - 1], key) == 0) {
 				return _props_->props[i]; /* se retorna el valor */
@@ -155,8 +165,8 @@ _zReturn_(zText) zGetValue(zProp props, zText key)
 */
 _zReturn_(zPropError) zAddProp(zProp props, zText key, zText value)
 {
-	DECLARE_LV(props);
 	if (props != NULL && key != NULL) {
+		DECLARE_LV(props);
 		if (!zAddKeyOrValue((_zProp_*)props, key))     // key
 			return zProp_OUTOFMEMORY;
 		if (!zAddKeyOrValue((_zProp_*)props, value)) { // value
@@ -246,16 +256,14 @@ void _zPropRead(zProp* props, zPropError* error, int file)
 		if (_cp_val_ || _cp_key_ || _stop_)
 		{
 			if (_cp_key_ && _stop_) {
-				// error de sintaxis
+				SYNTAX_ERROR // error de sintaxis
 			}
 			if (_cp_val_ && (_newLine_ || _stop_)) {
 				_cp_val_ = false;
 				// agregar el valor de la clave
 				copy_bt[j] = '\0';
 				if (!zAddKeyOrValue((_zProp_*)*props, copy_bt)) {
-					*error = zProp_OUTOFMEMORY;
-					zFreeProp(*props);
-					break; // memoria insuficiente
+					OUTOFMEMORY_ERROR // memoria insuficiente
 				}
 				j = 0;
 			}
@@ -279,10 +287,7 @@ void _zPropRead(zProp* props, zPropError* error, int file)
 			_comment_ = false;
 			_newLine_ = true;
 			if (_cp_key_) {
-				// error de sintaxis
-				*error = zProp_SYNTAX;
-				zFreeProp(*props);
-				break;
+				SYNTAX_ERROR // error de sintaxis
 			}
 			continue;
 		}
@@ -317,16 +322,12 @@ void _zPropRead(zProp* props, zPropError* error, int file)
 					No existe la clave del valor. Ejemplo:
 					<vacio> = <valor>
 					*/
-					*error = zProp_SYNTAX;
-					zFreeProp(*props);
-					break;
+					SYNTAX_ERROR // error de sintaxis
 				}
 				// agregar la clave copiada
 				copy_bt[j] = '\0';
 				if (!zAddKeyOrValue((_zProp_*)*props, copy_bt)) {
-					*error = zProp_OUTOFMEMORY;
-					zFreeProp(*props);
-					break; // memoria insuficiente
+					OUTOFMEMORY_ERROR // memoria insuficiente
 				}
 				j = 0;
 				_cp_val_ = true;
@@ -340,17 +341,12 @@ void _zPropRead(zProp* props, zPropError* error, int file)
 			if (copy_bt == NULL) {
 				copy_bt = (char*)malloc((nBytes = 1024) + 1);
 				if (copy_bt == NULL) {
-					*error = zProp_OUTOFMEMORY;
-					zFreeProp(*props);
-					break; // memoria insuficiente
+					OUTOFMEMORY_ERROR // memoria insuficiente
 				}
-			}
-			else if (j == nBytes) {
+			} else if (j == nBytes) {
 				void* mem = (char*)realloc(copy_bt, (nBytes += 256) + 1);
 				if (mem == NULL) {
-					*error = zProp_OUTOFMEMORY;
-					zFreeProp(*props);
-					break; // memoria insuficiente
+					OUTOFMEMORY_ERROR // memoria insuficiente
 				}
 				copy_bt = (char*)mem;
 			}
@@ -389,7 +385,7 @@ _zReturn_(zPropError) zPropWriteW(zProp props, const wchar_t* filename)
 *
 *
 */
-void _zPropWrite(zProp props, zPropError* error, int file)
+void _zPropWrite(zProp props, int file)
 {
 	DECLARE_LV(props);
 	if (_props_ != NULL && _props_->count > 0) {
@@ -418,9 +414,9 @@ void _zPropWrite(zProp props, zPropError* error, int file)
 */
 _zReturn_(void) zPrintProp(zProp props)
 {
-	DECLARE_LV(props);
 	if (props != NULL)
 	{
+		DECLARE_LV(props);
 		for (int i = 1; i < _props_->count; i += 2) {
 			printf_s("%s=%s\n", _props_->props[i - 1], _props_->props[i]);
 		}
