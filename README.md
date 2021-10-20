@@ -10,25 +10,25 @@
 ### Funciones
 
 ```cpp
-zCreateProp(): zProp
+zProp zCreateProp();
 
-zContainsKey(zProp, zText): bool
+bool zContainsKey(zProp, zText);
 
-zRemoveKey(zProp, zText): bool
+bool zRemoveKey(zProp, zText);
 
-zFreeProp(zProp): bool
+bool zFreeProp(zProp);
 
-zGetValue(zProp, zText): zText
+zText zGetValue(zProp, zText);
 
-zAddProp(zProp, zText, zText): zPropError
+zPropError zAddProp(zProp, zText, zText);
 
-zGetCountProp(zProp): int
+int zGetCountProp(zProp);
 
-zPropReadA(zProp*, zText): zPropError
+zPropError zPropReadA(zProp*, zText);
 
-zPropReadW(zProp*, const wchart_t*): zPropError
+zPropError zPropReadW(zProp*, const wchart_t*);
 
-zPropWriteA(zProp, zText): zPropError
+zPropError zPropWriteA(zProp, zText);
 
-zPropWriteW(zProp, const wchart_t*): zPropError
+zPropError zPropWriteW(zProp, const wchart_t*);
 ```
