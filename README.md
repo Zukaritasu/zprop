@@ -9,7 +9,7 @@
 
 ### Funciones
 
-<link href="https://github.com/Zukaritasu/zProp/blob/main/syntax.css" rel="stylesheet" type="text/css">
+<link href="/syntax.css" rel="stylesheet" type="text/css">
 
 <font>
 <li> <func>zCreateProp</func>(): <typedef>zProp</typedef>
