@@ -167,6 +167,23 @@ _zReturn_(zPropError) zAddProp(zProp props, zText key, zText value)
 {
 	if (props != NULL && key != NULL) {
 		DECLARE_LV(props);
+
+		/* se verifica de que si existe la clave se actualiza su valor */
+		for (int i = 1; i < _props_->count; i += 2) {
+			if (strcmp(_props_->props[i - 1], key) == 0) {
+				char* text = _strdup(value);
+				if (text == NULL) {
+					/* error al actualizar el valor de la clave. 
+					Se mantiene valor sin cambios */
+					return zProp_OUTOFMEMORY;
+				}
+
+				free(_props_->props[i]);  /* se libera el valor anterior */
+				_props_->props[i] = text; /* se asignaa el nuevo valor */
+				break;
+			}
+		}
+
 		if (!zAddKeyOrValue((_zProp_*)props, key))     // key
 			return zProp_OUTOFMEMORY;
 		if (!zAddKeyOrValue((_zProp_*)props, value)) { // value
