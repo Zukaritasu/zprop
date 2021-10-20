@@ -128,18 +128,20 @@ _zReturn_(bool) zRemoveKey(zProp props, zText key)
 */
 _zReturn_(void) zFreeProp(zProp props)
 {
-	DECLARE_LV(props);
-	for (int i = 0; i < _props_->count; i++) {
-		/* se libera la memoria usada por las claves y valores */
-		free(_props_->props[i]);
-		if ((i + 1) == _props_->count) {
-			/* se libera la memoria usada por el array de string */
-			free(_props_->props);
-			break;
+	if (props != NULL) {
+		DECLARE_LV(props);
+		for (int i = 0; i < _props_->count; i++) {
+			/* se libera la memoria usada por las claves y valores */
+			free(_props_->props[i]);
+			if ((i + 1) == _props_->count) {
+				/* se libera la memoria usada por el array de string */
+				free(_props_->props);
+				break;
+			}
 		}
+		/* se libera la memoria usada por la estructura _zProp_ */
+		free(_props_);
 	}
-	/* se libera la memoria usada por la estructura _zProp_ */
-	free(_props_);
 }
 
 /**
