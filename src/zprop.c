@@ -174,13 +174,13 @@ _zReturn_(zPropError) zAddProp(zProp props, zText key, zText value)
 				char* text = _strdup(value);
 				if (text == NULL) {
 					/* error al actualizar el valor de la clave. 
-					Se mantiene valor sin cambios */
+					Se mantiene el valor sin cambios */
 					return zProp_OUTOFMEMORY;
 				}
 
 				free(_props_->props[i]);  /* se libera el valor anterior */
-				_props_->props[i] = text; /* se asignaa el nuevo valor */
-				break;
+				_props_->props[i] = text; /* se asigna el nuevo valor */
+				return zProp_OK;
 			}
 		}
 
