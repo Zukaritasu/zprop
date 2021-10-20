@@ -9,28 +9,26 @@
 
 ### Funciones
 
-<link href="/syntax.css" rel="stylesheet" type="text/css">
+```cpp
+zCreateProp(): zProp
 
-<font>
-<li> <func>zCreateProp</func>(): <typedef>zProp</typedef>
+zContainsKey(zProp, zText): bool
 
-<li> <func>zContainsKey</func>(<typedef>zProp</typedef>, <typedef>zText</typedef>): <primitive>bool</primitive>
+zRemoveKey(zProp, zText): bool
 
-<li> <func>zRemoveKey</func>(<typedef>zProp</typedef>, <typedef>zText</typedef>): <primitive>bool</primitive>
+zFreeProp(zProp): bool
 
-<li> <func>zFreeProp</func>(<typedef>zProp</typedef>): <primitive>bool</primitive>
+zGetValue(zProp, zText): zText
 
-<li> <func>zGetValue</func>(<typedef>zProp</typedef>, <typedef>zText</typedef>): <typedef>zText</typedef>
+zAddProp(zProp, zText, zText): zPropError
 
-<li> <func>zAddProp</func>(<typedef>zProp</typedef>, <typedef>zText</typedef>, <typedef>zText</typedef>): <typedef>zPropError</typedef>
+zGetCountProp(zProp): int
 
-<li> <func>zGetCountProp</func>(<typedef>zProp</typedef>): <primitive>int</primitive>
+zPropReadA(zProp*, zText): zPropError
 
-<li> <func>zPropReadA</func>(<typedef>zProp</typedef>*, <typedef>zText</typedef>): <typedef>zPropError</typedef>
+zPropReadW(zProp*, const wchart_t*): zPropError
 
-<li> <func>zPropReadW</func>(<typedef>zProp</typedef>*,  <primitive>const</primitive> <typedef>wchart_t</typedef>*): <typedef>zPropError</typedef>
+zPropWriteA(zProp, zText): zPropError
 
-<li> <func>zPropWriteA</func>(<typedef>zProp</typedef>, <typedef>zText</typedef>): <typedef>zPropError</typedef>
-
-<li> <func>zPropWriteW</func>(<typedef>zProp</typedef>, <primitive>const</primitive> <typedef>wchart_t</typedef>*): <typedef>zPropError</typedef>
-</font>
+zPropWriteW(zProp, const wchart_t*): zPropError
+```
