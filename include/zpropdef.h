@@ -5,6 +5,7 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 #pragma once
+
 #ifndef ZPROPDEF_H
 #define ZPROPDEF_H
 

@@ -68,7 +68,7 @@ typedef struct
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 void _zPropRead(zProp* props, zPropError* error, int file);
-void _zPropWrite(zProp props, zPropError* error, int file);
+void _zPropWrite(zProp props, int file);
 bool zAddKeyOrValue(_zProp_* props, zText str);
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -389,7 +389,7 @@ void _zPropWrite(zProp props, int file)
 {
 	DECLARE_LV(props);
 	if (_props_ != NULL && _props_->count > 0) {
-		char s = '=', n = '\n'; /* caracteres para la sintaxis */
+		char s = '=', n = '\n'; /* caracteres para el formato del archivo */
 
 		for (int i = 1; i < _props_->count; i += 2) {
 			_write(file, _props_->props[i - 1], 
