@@ -1,11 +1,13 @@
 # zProp
 
->zProp es una libreria que contiene herramientas para escribir y leer archivos de propiedades **.properties**
+----
+
+zProp es una libreria que contiene herramientas para escribir y leer archivos de propiedades **.properties**
 
 ## Includes
-> **zprop.h** contiene las funciones para agregar, remover, editar, crear, leer y escribir archivos **.properties**. Cuenta tambien con un enumerado *zPropError* que especifica el error ocurrido en una función
+**zprop.h** contiene las funciones para agregar, remover, editar, crear, leer y escribir archivos **.properties**. Cuenta tambien con un enumerado *zPropError* que especifica el error ocurrido en una función
 
-> **zpropdef.h** contiene el tipo de dato **zProp** que es usado por las funciones declaradas en **zprop.h**
+**zpropdef.h** contiene el tipo de dato **zProp** que es usado por las funciones declaradas en **zprop.h**
 
 ### Funciones
 
