@@ -102,13 +102,13 @@ void zp_free(pzprop prop);
 /*
  * Retorna el valor de la clave solicitada. La función puede retornar NULL si los parámetros son
  * inválidos o la clave no existe en el conjunto de propiedades aunque en tal caso una clave
- * puede tener un valor que sea NULL hay que tomar eso en cuenta
+ * puede tener un valor NULL, hay que tomar eso en cuenta
  */
 cstr_t zp_value(pzprop prop, cstr_t key);
 
 /*
  * Las siguientes funciones convierte el valor en el tipo de dato que retorna cada función. Si el
- * valor es inválido siendo NULL o un valor que no se puede convertir la función retorna 0 como
+ * valor es inválido siendo NULL o un valor que no se puede convertir, la función retorna 0 como
  * valor por defecto
  */
 int zp_int(pzprop prop, cstr_t key);
