@@ -1,15 +1,15 @@
-# zProp
+# zprop
 
 ----
 
 **zprop** es una libreria que contiene funciones para escribir y leer archivos de propiedades **.properties**
 
 ## Includes
-**zprop.h** contiene las funciones para agregar, remover, editar, conversion y otras mas **.properties**.
+**fileprop.h** contiene las funciones para agregar, remover, editar, conversion y otras mas **.properties**.
 
 ### Funciones
 
-```cpp
+```h
 
 /* 
  * Retorna true si la clave existe en el conjunto de propiedades. Si los parámetros son inválidos
