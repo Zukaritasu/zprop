@@ -19,7 +19,7 @@ bool zp_contains(pzprop prop, cstr_t key);
 
 /* 
  * Remueve una clave y su valor del conjunto de propiedades. Si los parámetros son invalidos o
- * la clave no existe la función retorna false. Tambien puede * retornar false si ocurrió un error
+ * la clave no existe la función retorna false. Tambien puede retornar false si ocurrió un error
  * al reasignar memoria, en este caso debe consultar errno 
  */
 bool zp_remove(pzprop prop, cstr_t key);
@@ -73,19 +73,19 @@ bool zp_read_w(pzprop* prop, cwstr_t filename);
  *
  * 		“clave=lunes’\n’martes’\n’\t’’”
  *
- * La función puede retornar false si  los parámetros son inválidos o ocurrió un error en la
- * apertura o escritura del archivo. Debe consultar errno
+ * La función puede retornar false si los parámetros son inválidos o ocurrió un error en la
+ * apertura, escritura del archivo o al reasignar memoria. Debe consultar errno
  */
 bool zp_write_a(pzprop prop, cstr_t filename);
 bool zp_write_w(pzprop prop, cwstr_t filename);
 
 // Compatibilidad con ASCII y UNICODE
 #ifdef UNICODE
-#	define zp_read zp_read_w
-#	define zp_write zp_write_w
+#  define zp_read zp_read_w
+#  define zp_write zp_write_w
 #else
-#	define zp_read zp_read_a
-#	define zp_write zp_write_a
+#  define zp_read zp_read_a
+#  define zp_write zp_write_a
 #endif
 
 /*
@@ -108,7 +108,7 @@ cstr_t zp_value(pzprop prop, cstr_t key);
 
 /*
  * Las siguientes funciones convierte el valor en el tipo de dato que retorna cada función. Si el
- * valor es  inválido siendo NULL o un valor que no se puede convertir la función retorna 0 como
+ * valor es inválido siendo NULL o un valor que no se puede convertir la función retorna 0 como
  * valor por defecto
  */
 int zp_int(pzprop prop, cstr_t key);
