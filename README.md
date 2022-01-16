@@ -110,6 +110,9 @@ cstr_t zp_value(pzprop prop, cstr_t key);
  * Las siguientes funciones convierte el valor en el tipo de dato que retorna cada función. Si el
  * valor es inválido siendo NULL o un valor que no se puede convertir, la función retorna 0 como
  * valor por defecto
+ *
+ * El valor para la funcion 'zp_bool' puede ser "true" o '1' para indicar un valor true, todo
+ * distinto de eso es false
  */
 int zp_int(pzprop prop, cstr_t key);
 int64_t zp_int64(pzprop prop, cstr_t key);
