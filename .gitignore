@@ -3,8 +3,10 @@ vstudio/Release
 vstudio/Debug
 vstudio/x64
 vstudio/.vs
+vstudio/main.cpp
 vstudio/zprop.aps
 vstudio/zprop.sdf
+vstudio/zprop.opensdf
 lib/x86/zprop.exp
 lib/x86/zprop.iobj
 lib/x86/zprop.ipdb
