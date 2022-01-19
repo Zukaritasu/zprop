@@ -234,7 +234,7 @@ size_t Properties::Size() const
 	return data.size() == 0 ? 0 : data.size() / 2;
 }
 
-bool Properties::Read(const std::string& filename)
+bool Properties::Load(const std::string& filename)
 {
 	std::ifstream in(filename);
 	if (in.is_open()) {
@@ -249,7 +249,7 @@ bool Properties::Read(const std::string& filename)
 	return false;
 }
 
-bool Properties::Write(const std::string& filename)
+bool Properties::Save(const std::string& filename)
 {
 	std::ofstream out(filename);
 	if (out.is_open()) {
