@@ -201,7 +201,7 @@ public:
 	 * @param filename El nombre del arhivo .properties
 	 * @return 
 	 */
-	bool Read(const std::string& filename);
+	bool Load(const std::string& filename);
 
 	/**
 	 * @brief Escribe un archivo de propiedades. Si el valor contiene
@@ -216,7 +216,7 @@ public:
 	 * @param filename El nombre del arhivo .properties
 	 * @return
 	 */
-	bool Write(const std::string& filename);
+	bool Save(const std::string& filename);
 
 	/**
 	 * @brief Imprime todo el conjunto de propiedades. El metodo muestra
