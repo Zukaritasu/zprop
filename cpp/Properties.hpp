@@ -82,13 +82,13 @@ private:
 	/**
 	 * @brief Cambia los caracteres de control '\t', '\f', '\r' y '\n'
 	 * agregando una barra diagonal '\' y luego el caracter que representa
-	 * ese caracter para  que desde el archivo se pueda presenciar los
+	 * ese caracter para que desde el archivo se pueda presenciar los
 	 * caracteres de control.
 	 * 
 	 * @param value el string al que cambiaran los caracteres
-	 * @return const std::string& resultado
+	 * @param out Donde se guardara el string con los cambios
 	 */
-	const std::string& ResolveString(const std::string& value);
+	void ResolveString(std::ofstream& out, const std::string& value);
 
 	/**
 	 * @brief Agrega un valor al conjunto de propiedades. Este valor
@@ -128,6 +128,7 @@ private:
 	void RemoveRange(uint32_t begin, uint32_t end);
 public:
 
+	Properties() {}
 	Properties(const Properties&) = delete;
 	~Properties();
 
@@ -226,13 +227,15 @@ public:
 	void Print() const;
 
 	/**
-	 * @brief Retorna el valor soicitado por la clave del valor. Si la
-	 * clave no existe el metodo retorna una cadena vacio
+	 * @brief Retorna el valor solicitado por la clave del valor. Si la
+	 * clave no existe el metodo retorna nullptr aunque tambien puede
+	 * retornar nullptr si la clave no tiene valor o en un comienzo se
+	 * agrego el valor como una cadena vacia
 	 * 
 	 * @param key La clave del valor
-	 * @return const std::string& El valor
+	 * @return const char* El valor
 	 */
-	const std::string& GetValue(const std::string& key);
+	const char* GetValue(const std::string& key);
 
 	/**
 	 * @brief Convierte el valor de la clave en un valor entero 'int'
@@ -243,8 +246,8 @@ public:
 	 * @return int 
 	 */
 	int GetInt(const std::string& key) {
-		std::string value = GetValue(key);
-		if (value.size() != 0) { return std::stoi(value); }
+		auto value = GetValue(key);
+		if (value != nullptr) { return std::stoi(value); }
 		return 0;
 	}
 
@@ -257,8 +260,8 @@ public:
 	 * @return int64_t 
 	 */
 	int64_t GetInt64(const std::string& key) {
-		std::string value = GetValue(key);
-		if (value.size() != 0) { return std::stoll(value); }
+		auto value = GetValue(key);
+		if (value != nullptr) { return std::stoll(value); }
 		return 0;
 	}
 
@@ -271,9 +274,9 @@ public:
 	 * @return bool
 	 */
 	bool GetBool(const std::string& key) {
-		std::string value = GetValue(key);
-		if (value.size() != 0) { 
-			return value.compare("true") == 0 || value[0] == '1';
+		auto value = GetValue(key);
+		if (value != nullptr) { 
+			return std::strcmp(value, "true") == 0 || value[0] == '1';
 		}
 		return false;
 	}
@@ -287,8 +290,8 @@ public:
 	 * @return double 
 	 */
 	double GetDouble(const std::string& key) {
-		std::string value = GetValue(key);
-		if (value.size() != 0) { return std::stod(value); }
+		auto value = GetValue(key);
+		if (value != nullptr) { return std::stod(value); }
 		return 0;
 	}
 
@@ -299,7 +302,7 @@ public:
 	 * @param key  La clave del valor
 	 * @return const std::string& 
 	 */
-	const std::string& operator[](const std::string& key) {
+	const char* operator[](const std::string& key) {
 		return GetValue(key);
 	}
 };
