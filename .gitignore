@@ -2,6 +2,7 @@
 vstudio/Release
 vstudio/Debug
 vstudio/x64
+vstudio/.vs
 vstudio/zprop.aps
 vstudio/zprop.sdf
 lib/x86/zprop.exp

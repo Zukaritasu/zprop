@@ -22,12 +22,6 @@
     <ClCompile Include="..\src\fileprop.c" />
     <ClCompile Include="..\include\fileprop.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="zprop.rc" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C11FAA2D-06F0-4430-A489-BB7085069A8B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
