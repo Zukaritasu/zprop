@@ -22,12 +22,12 @@
 #include <cstdlib>
 #include <cstring>
 
-
-
 Properties::~Properties()
 {
-	for (auto elem : data) {
-		elem->~basic_string();
+	for (auto elem : data)  {
+		if (elem != nullptr) {
+			elem->~basic_string();
+		}
 	}
 }
 
@@ -77,21 +77,19 @@ std::string* Properties::Convert(const std::string &value)
 	return str;
 }
 
-const std::string& Properties::ResolveString(const std::string& value)
+void Properties::ResolveString(std::ofstream& out, const std::string& value)
 {
-	std::string aux;
 	for (size_t i = 0; i < value.size(); i++) {
 		switch (value[i]) {
-		case '\t': aux += "\\t"; break;
-		case '\f': aux += "\\f"; break;
-		case '\r': aux += "\\r"; break;
-		case '\n': aux += "\\n"; break;
+		case '\t': out << "\\t"; break;
+		case '\f': out << "\\f"; break;
+		case '\r': out << "\\r"; break;
+		case '\n': out << "\\n"; break;
 		default:
-			aux += value[i];
+			out << value[i];
 			break;
 		}
 	}
-	return std::string(aux);
 }
 
 void Properties::AddValue(const std::string &value, bool is_value)
@@ -258,7 +256,7 @@ bool Properties::Write(const std::string& filename)
 		for (size_t i = 1; !out.fail() && i < data.size(); i += 2) {
 			out << *(data[i - 1]) << '=';
 			if (data[i] != nullptr) {
-				out << ResolveString(*(data[i]));
+				ResolveString(out, *(data[i]));
 			}
 			if (i + 2 < data.size()) {
 				out << std::endl;
@@ -279,8 +277,10 @@ void Properties::Print() const
 	}
 }
 
-const std::string& Properties::GetValue(const std::string &key)
+const char* Properties::GetValue(const std::string &key)
 {
 	size_t i = IndexOf(key);
-	return (i != UINT32_MAX) ? *(data[i + 1]) : std::string();
+	return (i != UINT32_MAX && 
+		data[i + 1] != nullptr) ? 
+		data[i + 1]->c_str(): nullptr;
 }
