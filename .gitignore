@@ -1,6 +1,9 @@
 .vscode
-proyect
-zprop_cpp
+vstudio/Release
+vstudio/Debug
+vstudio/x64
+vstudio/zprop.aps
+vstudio/zprop.sdf
 lib/x86/zprop.exp
 lib/x86/zprop.iobj
 lib/x86/zprop.ipdb
