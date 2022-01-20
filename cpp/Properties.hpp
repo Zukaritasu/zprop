@@ -156,6 +156,14 @@ private:
 	 */
 	void RemoveRange(uint32_t begin, uint32_t end);
 	
+	/**
+	 * @brief Agrega una nueva clave y su valor al conjunto de
+	 * propiedades. Este metodo es llamado por el metodo Properties:Add
+	 * 
+	 * @param key La clave
+	 * @param value EL valor de la clave
+	 * @return 
+	 */
 	bool AddValueForType(const std::string& key, const std::string& value);
 public:
 
@@ -197,11 +205,16 @@ public:
 	 * @brief Agrega una nueva clave y su valor al conjunto de
 	 * propiedades. Para que el metodo tenga éxito la clave no debe 
 	 * existir en el conjunto de propiedades además la clave no puede
-	 * ser una cadena vacía
+	 * ser una cadena vacía.
 	 * 
-	 * @tparam V
-	 * @param key   
-	 * @param value 
+	 * Este metodo aceptar los siguientes tipos (string, char, int,
+	 * unsigned, long, long long, unsigned long, unsigned long long,
+	 * float, double y long double)
+	 * 
+	 * @tparam V Para lograr aceptar cualquier tipo de valor (enteros,
+	 * decimales, booleanos o string)
+	 * @param key La clave
+	 * @param value El valor de la clave
 	 * @return 
 	 */
 	template<typename V> 
@@ -272,6 +285,11 @@ public:
 	 */
 	const char* GetValue(const std::string& key);
 
+#define ZP_GET_VALUE(func, def_v)                       \
+		auto value = GetValue(key);                     \
+		if (value != nullptr) { return func##(value); } \
+		return def_v;
+
 	/**
 	 * @brief Convierte el valor de la clave en un valor entero 'int'
 	 * usando la funcion 'std::stoi'. Si el valor no se pudo convertir, el
@@ -281,9 +299,19 @@ public:
 	 * @return int 
 	 */
 	int GetInt(const std::string& key) {
-		auto value = GetValue(key);
-		if (value != nullptr) { return std::stoi(value); }
-		return 0;
+		ZP_GET_VALUE(std::stoi, 0);
+	}
+
+	/**
+	 * @brief Convierte el valor de la clave en un valor entero 'int'
+	 * usando la funcion 'std::stoi'. Si el valor no se pudo convertir, el
+	 * valor por defecto que retorna este metodo es 0 
+	 * 
+	 * @param key La clave del valor
+	 * @return int 
+	 */
+	unsigned GetUnsigned(const std::string& key) {
+		ZP_GET_VALUE(std::stoul, 0);
 	}
 
 	/**
@@ -295,9 +323,19 @@ public:
 	 * @return int64_t 
 	 */
 	int64_t GetInt64(const std::string& key) {
-		auto value = GetValue(key);
-		if (value != nullptr) { return std::stoll(value); }
-		return 0;
+		ZP_GET_VALUE(std::stoll, 0);
+	}
+
+	/**
+	 * @brief Convierte el valor de la clave en un valor entero
+	 * largo 'int64_t' usando la funcion 'std::stoll'. Si el valor no se
+	 * pudo convertir, el valor por defecto que retorna esta funcion es 0 
+	 * 
+	 * @param key La clave del valor
+	 * @return int64_t 
+	 */
+	unsigned long long GetULongLong(const std::string& key) {
+		ZP_GET_VALUE(std::stoull, 0);
 	}
 
 	/**
@@ -325,9 +363,19 @@ public:
 	 * @return double 
 	 */
 	double GetDouble(const std::string& key) {
-		auto value = GetValue(key);
-		if (value != nullptr) { return std::stod(value); }
-		return 0;
+		ZP_GET_VALUE(std::stod, 0);
+	}
+
+	/**
+	 * @brief Convierte el valor de la clave en un valor de tipo
+	 * 'long double' usando la funcion 'std::stold'. Si el valor no se pudo
+	 * convertir, el valor por defecto que retorna esta funcion es 0
+	 * 
+	 * @param key La clave del valor
+	 * @return long double 
+	 */
+	long double GetLongDouble(const std::string& key) {
+		ZP_GET_VALUE(std::stold, 0);
 	}
 
 	/**
