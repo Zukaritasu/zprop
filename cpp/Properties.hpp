@@ -303,9 +303,9 @@ public:
 	}
 
 	/**
-	 * @brief Convierte el valor de la clave en un valor entero 'int'
-	 * usando la funcion 'std::stoi'. Si el valor no se pudo convertir, el
-	 * valor por defecto que retorna este metodo es 0 
+	 * @brief Convierte el valor de la clave en un valor entero sin signo
+	 * 'unsigned'usando la funcion 'std::stoul'. Si el valor no se pudo
+	 * convertir, el valor por defecto que retorna este metodo es 0 
 	 * 
 	 * @param key La clave del valor
 	 * @return int 
@@ -316,23 +316,24 @@ public:
 
 	/**
 	 * @brief Convierte el valor de la clave en un valor entero
-	 * largo 'int64_t' usando la funcion 'std::stoll'. Si el valor no se
+	 * largo 'long long' usando la funcion 'std::stoll'. Si el valor no se
 	 * pudo convertir, el valor por defecto que retorna esta funcion es 0 
 	 * 
 	 * @param key La clave del valor
-	 * @return int64_t 
+	 * @return long long 
 	 */
-	int64_t GetInt64(const std::string& key) {
+	long long GetInt64(const std::string& key) {
 		ZP_GET_VALUE(std::stoll, 0);
 	}
 
 	/**
 	 * @brief Convierte el valor de la clave en un valor entero
-	 * largo 'int64_t' usando la funcion 'std::stoll'. Si el valor no se
-	 * pudo convertir, el valor por defecto que retorna esta funcion es 0 
+	 * largo 'unsigned long long' usando la funcion 'std::stoull'. Si el
+	 * valor no se pudo convertir, el valor por defecto que retorna esta
+	 * funcion es 0 
 	 * 
 	 * @param key La clave del valor
-	 * @return int64_t 
+	 * @return unsigned long long 
 	 */
 	unsigned long long GetULongLong(const std::string& key) {
 		ZP_GET_VALUE(std::stoull, 0);
