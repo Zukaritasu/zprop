@@ -20,6 +20,35 @@
 #include <vector>
 #include <cstdint>
 
+namespace std {
+	/**
+	 * @brief Para tener compatibilidad	con la plantilla que tiene el
+	 * metodo 'Properties::Add' se creo esta funcion para que aceptara
+	 * (const char* o string), tambien acompañado con la funcion
+	 * (string to_string(const string& value))
+	 * 
+	 * @param value 
+	 * @return string 
+	 */
+	inline string to_string(const string& value) {
+		return value;
+	}
+
+	/**
+	 * @brief Convierte un caracter en un string. Basicamente es un
+	 * string con un solo caracter. Esta funcion trabaja con el metodo
+	 * Properties::Add que tiene una plantilla
+	 * 
+	 * @param value El caracter a convertir
+	 * @return string 
+	 */
+	inline string to_string(char value) {
+		string str;
+		str += value;
+		return str;
+	}
+}
+
 class Properties
 {
 protected:
@@ -126,6 +155,8 @@ private:
 	 * @param end 
 	 */
 	void RemoveRange(uint32_t begin, uint32_t end);
+	
+	bool AddValueForType(const std::string& key, const std::string& value);
 public:
 
 	Properties() {}
@@ -168,11 +199,15 @@ public:
 	 * existir en el conjunto de propiedades además la clave no puede
 	 * ser una cadena vacía
 	 * 
+	 * @tparam V
 	 * @param key   
 	 * @param value 
 	 * @return 
 	 */
-	bool Add(const std::string& key, const std::string& value);
+	template<typename V> 
+	bool Add(const std::string& key, V value) {
+		return AddValueForType(key, std::to_string(value));
+	}
 
 	/**
 	 * @brief Retorna el tamano o la cantidad de propiedades existentes.
