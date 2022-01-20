@@ -381,7 +381,7 @@ public:
 
 	/**
 	 * @brief Hace lo mismo que el metodo Properties::GetValue pero en este
-	 * con el uso de un operador []
+	 * caso con el uso del operador[] y dentro de los corchetes va la clave
 	 * 
 	 * @param key  La clave del valor
 	 * @return const std::string& 
