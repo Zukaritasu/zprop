@@ -77,7 +77,8 @@ std::string* Properties::Convert(const std::string &value)
 	return str;
 }
 
-void Properties::ResolveString(std::ofstream& out, const std::string& value)
+void Properties::ResolveString(std::ofstream& out, 
+							   const std::string& value)
 {
 	for (size_t i = 0; i < value.size(); i++) {
 		switch (value[i]) {
@@ -220,7 +221,8 @@ bool Properties::Replace(const std::string &key, const std::string &value)
 	return false;
 }
 
-bool Properties::Add(const std::string &key, const std::string &value)
+bool Properties::AddValueForType(const std::string &key, 
+								 const std::string &value)
 {
 	if (IndexOf(key) == UINT32_MAX && !IsEmpty(key)) {
 		data.push_back(new std::string(key));
