@@ -256,7 +256,7 @@ bool _zp_write(pzprop prop, const void *filename, bool unicode)
 {
 	FILE *file;
 	if (prop != NULL && filename != NULL && (file = OPEN_FILE("w")) != NULL) {
-		for (size_t i = 0; i < prop->count; i += 2) {
+		for (size_t i = 1; i < prop->count; i += 2) {
 			char *val_c = NULL;
 			if (prop->data[i] != NULL && 
 				!_zp_resolve_str(&val_c, prop->data[i]))
