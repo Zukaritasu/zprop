@@ -22,6 +22,8 @@
 #include <cstdlib>
 #include <cstring>
 
+#define uchar unsigned char
+
 Properties::~Properties()
 {
 	for (auto elem : data)  {
@@ -39,7 +41,7 @@ bool Properties::Contains(const std::string& key)
 size_t Properties::IndexOf(const std::string& key)
 {
 	for (size_t i = 0; i < this->data.size(); i += 2) {
-		if (data[i]->compare(key) == 0) {
+		if ((*data[i]) == key) {
 			return i;
 		}
 	}
@@ -115,16 +117,16 @@ void Properties::AddProperty(const std::string &line)
 		_value:
 			if (temp.size() == 0)
 				break;
-			AddValue(temp, false);
+			AddValue(temp);
 			temp.clear();
 			cp_key = false;
 			continue;
 		}
 
-		if (space && isblank((unsigned char)c)) {
+		if (space && isblank((uchar)c)) {
 			if (cp_key && i + 1 < line.size()) {
 				c = line[i + 1];
-				if (!isblank((unsigned char)c) && c != '=' && c != ':') {
+				if (!isblank((uchar)c) && c != '=' && c != ':') {
 					goto _value;
 				}
 			}
@@ -140,7 +142,7 @@ void Properties::AddProperty(const std::string &line)
 		if (!cp_key && i + 1 == line.size()) {
 			std::string aux = temp;
 			for (int i = (int)(aux.size() - 1); i >= 0; i--) {
-				if (!isblank((unsigned char)aux[i]))
+				if (!isblank((uchar)aux[i]))
 					break;
 				temp = aux.substr(0, i);
 			}
@@ -149,7 +151,7 @@ void Properties::AddProperty(const std::string &line)
 
 	if (cp_key) {
 		if (temp.size() != 0) {
-			AddValue(temp, false);
+			AddValue(temp);
 			AddValue("", true);
 		}
 	} else {
@@ -210,7 +212,8 @@ bool Properties::Remove(const std::string &key)
 	return false;
 }
 
-bool Properties::Replace(const std::string &key, const std::string &value)
+bool Properties::Replace(const std::string &key, 
+						 const std::string &value)
 {
 	size_t index = IndexOf(key);
 	if (index++ != UINT32_MAX) {
@@ -257,12 +260,10 @@ bool Properties::Save(const std::string& filename)
 	if (out.is_open()) {
 		for (size_t i = 1; !out.fail() && i < data.size(); i += 2) {
 			out << *(data[i - 1]) << '=';
-			if (data[i] != nullptr) {
-				ResolveString(out, *(data[i]));
-			}
-			if (i + 2 < data.size()) {
+			if (data[i] != nullptr)
+				ResolveString(out, *data[i]);
+			if (i + 2 < data.size())
 				out << std::endl;
-			}
 		}
 		bool error = out.fail();
 		out.close();
@@ -282,7 +283,6 @@ void Properties::Print() const
 const char* Properties::GetValue(const std::string &key)
 {
 	size_t i = IndexOf(key);
-	return (i != UINT32_MAX && 
-		data[i + 1] != nullptr) ? 
-		data[i + 1]->c_str(): nullptr;
+	return (i != UINT32_MAX &&  data[i + 1] != nullptr) ? 
+								data[i + 1]->c_str(): nullptr;
 }
