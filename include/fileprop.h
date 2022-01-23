@@ -39,6 +39,26 @@ extern "C" {
 	typedef const wchar_t* cwstr_t;
 	typedef long double    ldouble_t;
 
+	typedef struct zprect
+	{
+		long x;
+		long y;
+		long width;
+		long height;
+	} zprect;
+
+	typedef struct zppoint
+	{
+		long x;
+		long y;
+	} zppoint;
+
+	typedef struct zpsize
+	{
+		long width;
+		long height;
+	} zpsize;
+
 #ifdef __ZPROP_LOCAL__
 	/* struct reservada para el developer */
 	typedef struct zprop
@@ -68,6 +88,9 @@ extern "C" {
 	ZPEXPORT bool      zp_addull   (pzprop prop, cstr_t key, uint64_t value);
 	ZPEXPORT bool      zp_addi64   (pzprop prop, cstr_t key, int64_t value);
 	ZPEXPORT bool      zp_addld    (pzprop prop, cstr_t key, ldouble_t value);
+	ZPEXPORT bool      zp_addr     (pzprop prop, cstr_t key, const zprect* r);
+	ZPEXPORT bool      zp_addp     (pzprop prop, cstr_t key, const zppoint* p);
+	ZPEXPORT bool      zp_addsz    (pzprop prop, cstr_t key, const zpsize* sz);
 
 	ZPEXPORT size_t    zp_size     (pzprop prop);
 
@@ -86,6 +109,9 @@ extern "C" {
 	ZPEXPORT uint64_t  zp_valueull (pzprop prop, cstr_t key);
 	ZPEXPORT double    zp_valued   (pzprop prop, cstr_t key);
 	ZPEXPORT float     zp_valuef   (pzprop prop, cstr_t key);
+	ZPEXPORT bool      zp_valuer   (pzprop prop, cstr_t key, zprect* r);
+	ZPEXPORT bool      zp_valuep   (pzprop prop, cstr_t key, zppoint* r);
+	ZPEXPORT bool      zp_valuesz  (pzprop prop, cstr_t key, zpsize* r);
 
 /* Compatibilidad con ASCII y UNICODE */
 #ifdef UNICODE /* UNICODE */

@@ -28,12 +28,9 @@
 
 typedef struct
 {
-	/* indica la cantidad de memoria asignada a 'data' */
 	size_t bytes;
-	/* la cantidad de caracteres de la cadena */
 	size_t count;
-	/* el string */
-	char *data;
+	char  *data;
 } STRING;
 
 #define STR_REALLOC_BYTES 512
@@ -62,17 +59,21 @@ typedef struct
 // ************************************************************************
 
 size_t _zp_indexof(pzprop prop, cstr_t key);
-bool _zp_write(pzprop prop, const void *filename, bool unicode);
-bool _zp_read(pzprop *prop, const void *filename, bool unicode);
-bool _zp_realloc(pzprop prop, int count_e);
-bool _zp_is_empty(cstr_t value);
-bool _zp_read_line(STRING *line, FILE *file);
-bool _zp_append(STRING *str, char c);
-void _zp_app_property(pzprop prop, cstr_t kval, size_t cKval);
-bool _zp_add_value(pzprop prop, cstr_t value, bool is_value);
-char *_zp_convert(char *out, cstr_t in);
-bool _zp_resolve_str(char **out, const char *in);
-bool _zp_replace(pzprop prop, cstr_t key, cstr_t value);
+bool   _zp_write(pzprop prop, const void *filename, bool unicode);
+bool   _zp_read(pzprop *prop, const void *filename, bool unicode);
+bool   _zp_realloc(pzprop prop, int count_e);
+bool   _zp_is_empty(cstr_t value);
+bool   _zp_read_line(STRING *line, FILE *file);
+bool   _zp_append(STRING *str, char c);
+void   _zp_app_property(pzprop prop, cstr_t kval, size_t cKval);
+bool   _zp_add_value(pzprop prop, cstr_t value, bool is_value);
+char*  _zp_convert(char *out, cstr_t in);
+bool   _zp_resolve_str(char **out, const char *in);
+bool   _zp_replace(pzprop prop, cstr_t key, cstr_t value);
+size_t _zp_str_length_control(const char *in);
+bool   _zp_substr_token(char* out, size_t begin, size_t end);
+bool   _zp_add_geometry(pzprop prop, cstr_t key, const long* g, size_t c);
+bool   _zp_value_geometry(pzprop prop, cstr_t key, long* g, size_t c);
 
 // ************************************************************************
 
@@ -165,6 +166,54 @@ ZPEXPORT double zp_valued(pzprop prop, cstr_t key)
 ZPEXPORT float zp_valuef(pzprop prop, cstr_t key)
 { STR_TO_NUMBERF(strtof); }
 
+ZPEXPORT bool zp_valuer(pzprop prop, cstr_t key, zprect* r)
+{
+	return r ? _zp_value_geometry(prop, key, (long*)r, 4)
+		: false;
+}
+
+ZPEXPORT bool zp_valuep(pzprop prop, cstr_t key, zppoint* p)
+{
+	return p ? _zp_value_geometry(prop, key, (long*)p, 2)
+		: false;
+}
+
+ZPEXPORT bool zp_valuesz(pzprop prop, cstr_t key, zpsize* sz)
+{
+	return sz ? _zp_value_geometry(prop, key, (long*)sz, 2)
+		: false;
+}
+
+bool _zp_value_geometry(pzprop prop, cstr_t key, long* g, size_t c)
+{
+	memset(g, 0, sizeof(long) * c);
+	char* value = _strdup(zp_value(prop, key));
+	if (value != NULL) {
+		if (strlen(value) > 0)
+		{
+			for (size_t i = 0; i < c; i++) {
+				char* number = strtok(_strdup(value), ",");
+				if (!number)
+				{
+					free(value);
+					return false;
+				}
+				size_t len = strlen(number);
+				g[i] = strtol(number, NULL, 10);
+				free(number);
+
+				if (!_zp_substr_token(value, len + 1,
+					strlen(value))) {
+					break;
+				}
+			}
+		}
+		free(value);
+		return true;
+	}
+	return false;
+}
+
 ZPEXPORT char zp_valuec(pzprop prop, cstr_t key)
 {
 	cstr_t str = zp_value(prop, key);
@@ -177,7 +226,7 @@ bool _zp_replace(pzprop prop, cstr_t key, cstr_t value)
 {
 	size_t i = _zp_indexof(prop, key);
 	if (i++ != UINT32_MAX) {
-		char *text = value != NULL ? strdup(value) : NULL;
+		char *text = value != NULL ? _strdup(value) : NULL;
 		if (text != NULL || value == NULL) {
 			free(prop->data[i]);
 			prop->data[i] = _zp_convert(text, text);
@@ -230,6 +279,39 @@ ZPEXPORT bool zp_addi64(pzprop prop, cstr_t key, int64_t value)
 ZPEXPORT bool zp_addld(pzprop prop, cstr_t key, ldouble_t value)
 { NUMBER_TO_STR("%Lf"); }
 
+ZPEXPORT bool zp_addr(pzprop prop, cstr_t key, const zprect* r)
+{
+	return r ? _zp_add_geometry(prop, key, (const long*)r, 4)
+		: false;
+}
+
+ZPEXPORT bool zp_addp(pzprop prop, cstr_t key, const zppoint* p)
+{
+	return p ? _zp_add_geometry(prop, key, (const long*)p, 2)
+		: false;
+}
+
+ZPEXPORT bool zp_addsz(pzprop prop, cstr_t key, const zpsize* sz)
+{
+	return sz ? _zp_add_geometry(prop, key, (const long*)sz, 2)
+		: false;
+}
+
+bool _zp_add_geometry(pzprop prop, cstr_t key, const long* g, 
+					  size_t c)
+{
+	char buf[260] = { 0 };
+	char num[100];
+	for (size_t i = 0; i < c; i++) {
+		sprintf(num, "%d", g[i]);
+		strcat(buf, num);
+		if (i + 1 < c) {
+			strcat(buf, ",");
+		}
+	}
+	return zp_add(prop, key, buf);
+}
+
 ZPEXPORT bool zp_addc(pzprop prop, cstr_t key, char value)
 {
 	if (value == '\0') {
@@ -258,11 +340,40 @@ ZPEXPORT bool zp_read_a(pzprop *prop, cstr_t filename)
 ZPEXPORT bool zp_read_w(pzprop *prop, cwstr_t filename)
 { return _zp_read(prop, filename, true); }
 
+bool _zp_substr_token(char* out, size_t begin, size_t end)
+{
+	if (begin == end || begin > end)
+		return false;
+
+	size_t i = begin, j = 0;
+	for (; i < end; i++)
+	{
+		if (out[i] == ',' && i == begin++)
+			continue;
+		out[j++] = out[i];
+	}
+	out[j] = '\0';
+	return j != 0;
+}
+
+size_t _zp_str_length_control(const char *in)
+{
+	size_t length = strlen(in);
+	for (size_t i = 0; in[i] != '\0'; i++) {
+		if (in[i] == '\t' || in[i] == '\f' || 
+			in[i] == '\r' || in[i] == '\n') {
+			length++;
+		}
+	}
+	return length;
+}
+
 bool _zp_resolve_str(char **out, const char *in)
 {
 	if (in != NULL && out != NULL) {
 		size_t len = strlen(in);
-		if ((*out = (char *)calloc(len * 2 + 1, 1)) != NULL) {
+		if ((*out = (char *)calloc(
+			_zp_str_length_control(in) + 1, 1)) != NULL) {
 			for (size_t i = 0, j = 0; i < len; i++) {
 				switch (in[i]) {
 				case '\t':
@@ -295,24 +406,25 @@ bool _zp_resolve_str(char **out, const char *in)
 bool _zp_write_line(FILE *file, cstr_t key, cstr_t value)
 {
 	if (value == NULL) {
-		return fprintf(file, "%s=\n", key) >= 0;
+		fprintf(file, "%s=\n", key);
 	} else {
-		char *value_c = NULL;
-		if (_zp_resolve_str(&value_c, value)) {
-			bool error = fprintf(file, "%s=%s\n", key, value_c) >= 0;
-			free(value_c);
-			return error;
-		}
+		char *aux = NULL;
+		if (!_zp_resolve_str(&aux, value))
+			return false;
+		fprintf(file, "%s=%s\n", key, aux);
+		free(aux);
 	}
-	return false;
+	return true;
 }
 
 bool _zp_write(pzprop prop, const void *filename, bool unicode)
 {
 	FILE *file;
-	if (prop != NULL && filename != NULL && (file = OPEN_FILE("w")) != NULL) {
+	if (prop != NULL && filename != NULL && 
+		(file = OPEN_FILE("w")) != NULL) {
 		for (size_t i = 1; i < prop->count; i += 2) {
-			if (!_zp_write_line(file, prop->data[i - 1], prop->data[i])) {
+			if (!_zp_write_line(file, prop->data[i - 1], 
+				prop->data[i])) {
 				break;
 			}
 		}
@@ -325,7 +437,8 @@ bool _zp_write(pzprop prop, const void *filename, bool unicode)
 bool _zp_read(pzprop *prop, const void *filename, bool unicode)
 {
 	FILE *file;
-	if (prop != NULL && filename != NULL && (file = OPEN_FILE("r")) != NULL) {
+	if (prop != NULL && filename != NULL && 
+		(file = OPEN_FILE("r")) != NULL) {
 		if (*prop == NULL && (*prop = zp_create()) == NULL)
 			goto _closefl_;
 
@@ -495,7 +608,7 @@ bool _zp_add_value(pzprop prop, cstr_t value, bool is_value)
 			prop->data[prop->count - 1] = NULL;
 			return true;
 		} else {
-			char *value_c = strdup(value);
+			char *value_c = _strdup(value);
 			if (value_c != NULL) {
 				prop->data[prop->count - 1] = value_c;
 				if (is_value)
