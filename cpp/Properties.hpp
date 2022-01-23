@@ -368,6 +368,18 @@ public:
 	}
 
 	/**
+	 * @brief Convierte el valor de la clave en un valor de tipo 'float'
+	 * usando la funcion 'std::stof'. Si el valor no se pudo convertir, el
+	 * valor por defecto que retorna esta funcion es 0
+	 * 
+	 * @param key La clave del valor
+	 * @return double 
+	 */
+	float GetFloat(const std::string& key) {
+		ZP_GET_VALUE(std::stof, 0);
+	}
+
+	/**
 	 * @brief Convierte el valor de la clave en un valor de tipo
 	 * 'long double' usando la funcion 'std::stold'. Si el valor no se pudo
 	 * convertir, el valor por defecto que retorna esta funcion es 0

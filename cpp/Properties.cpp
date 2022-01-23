@@ -283,6 +283,6 @@ void Properties::Print() const
 const char* Properties::GetValue(const std::string &key)
 {
 	size_t i = IndexOf(key);
-	return (i != UINT32_MAX &&  data[i + 1] != nullptr) ? 
-								data[i + 1]->c_str(): nullptr;
+	return (i != UINT32_MAX && data[i + 1] != nullptr) ? 
+							   data[i + 1]->c_str(): nullptr;
 }

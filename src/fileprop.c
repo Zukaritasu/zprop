@@ -41,6 +41,23 @@ typedef struct
 #define OPEN_FILE(flag) \
 	(unicode ? _wfopen((const wchar_t *)filename, L##flag) : \
 	fopen((const char *)filename, flag))
+	
+#define NUMBER_TO_STR(type) \
+	char buf[100]; \
+	sprintf(buf, type, value); \
+	return zp_add(prop, key, buf); 
+	
+#define STR_TO_NUMBER(func) \
+	cstr_t value = zp_value(prop, key); \
+	if (value != NULL) \
+		return func(value, NULL, 10); \
+	return 0;
+
+#define STR_TO_NUMBERF(func) \
+	cstr_t value = zp_value(prop, key); \
+	if (value != NULL) \
+		return func(value, NULL); \
+	return 0;
 
 // ************************************************************************
 
@@ -55,16 +72,18 @@ void _zp_app_property(pzprop prop, cstr_t kval, size_t cKval);
 bool _zp_add_value(pzprop prop, cstr_t value, bool is_value);
 char *_zp_convert(char *out, cstr_t in);
 bool _zp_resolve_str(char **out, const char *in);
+bool _zp_replace(pzprop prop, cstr_t key, cstr_t value);
 
 // ************************************************************************
 
-ZPEXPORT void zp_free(pzprop prop)
+ZPEXPORT void zp_free(pzprop* prop)
 {
-	if (prop != NULL) {
-		for (size_t i = 0; i < prop->count; i++)
-			free(prop->data[i]);
-		free(prop->data);
-		free(prop);
+	if (prop != NULL && (*prop) != NULL) {
+		for (size_t i = 0; i < (*prop)->count; i++)
+			free((*prop)->data[i]);
+		free((*prop)->data);
+		free(*prop);
+		(*prop) = NULL;
 	}
 }
 
@@ -102,17 +121,63 @@ ZPEXPORT bool zp_remove(pzprop prop, cstr_t key)
 	return false;
 }
 
+ZPEXPORT void zp_removeall(pzprop prop)
+{
+	if (prop != NULL) {
+		for (size_t i = 0; i < prop->count; i++)
+			free(prop->data[i]);
+		prop->count = 0;
+	}
+}
+
 ZPEXPORT cstr_t zp_value(pzprop prop, cstr_t key)
 {
 	size_t i = _zp_indexof(prop, key);
 	return (i != UINT32_MAX) ? prop->data[i + 1] : NULL;
 }
 
-ZPEXPORT bool _zp_replace(pzprop prop, cstr_t key, cstr_t value)
+ZPEXPORT bool zp_valueb(pzprop prop, cstr_t key)
+{
+	cstr_t value = zp_value(prop, key);
+	if (value)
+		return strcmp(value, "true") == 0 || value[0] == '1';
+	return 0;
+}
+
+ZPEXPORT int zp_valuei(pzprop prop, cstr_t key)
+{ STR_TO_NUMBER(strtol); }
+
+ZPEXPORT int64_t zp_valuei64(pzprop prop, cstr_t key)
+{ STR_TO_NUMBER(strtoll); }
+
+ZPEXPORT ldouble_t zp_valueld(pzprop prop, cstr_t key)
+{ STR_TO_NUMBERF(strtold); }
+
+ZPEXPORT uint32_t zp_valueul(pzprop prop, cstr_t key)
+{ STR_TO_NUMBER(strtoul); }
+
+ZPEXPORT uint64_t zp_valueull(pzprop prop, cstr_t key)
+{ STR_TO_NUMBER(strtoull); }
+
+ZPEXPORT double zp_valued(pzprop prop, cstr_t key)
+{ STR_TO_NUMBERF(strtod); }
+
+ZPEXPORT float zp_valuef(pzprop prop, cstr_t key)
+{ STR_TO_NUMBERF(strtof); }
+
+ZPEXPORT char zp_valuec(pzprop prop, cstr_t key)
+{
+	cstr_t str = zp_value(prop, key);
+	if (str != NULL)
+		return str[0];
+	return '\0';
+}
+
+bool _zp_replace(pzprop prop, cstr_t key, cstr_t value)
 {
 	size_t i = _zp_indexof(prop, key);
 	if (i++ != UINT32_MAX) {
-		char *text = value != NULL ? _strdup(value) : NULL;
+		char *text = value != NULL ? strdup(value) : NULL;
 		if (text != NULL || value == NULL) {
 			free(prop->data[i]);
 			prop->data[i] = _zp_convert(text, text);
@@ -124,7 +189,9 @@ ZPEXPORT bool _zp_replace(pzprop prop, cstr_t key, cstr_t value)
 
 ZPEXPORT bool zp_add(pzprop prop, cstr_t key, cstr_t value)
 {
-	if (prop != NULL && !_zp_is_empty(key) && !zp_contains(prop, key)) {
+	if (prop != NULL && !_zp_is_empty(key)) {
+		if (zp_contains(prop, key))
+			return _zp_replace(prop, key, value);
 		if (!_zp_add_value(prop, key, false))
 			return false;
 		if (!_zp_add_value(prop, value, true)) {
@@ -137,74 +204,47 @@ ZPEXPORT bool zp_add(pzprop prop, cstr_t key, cstr_t value)
 	return false;
 }
 
+ZPEXPORT bool zp_addb(pzprop prop, cstr_t key, bool value)
+{
+	return zp_add(prop, key, value ? "1" : "0");
+}
+
+ZPEXPORT bool zp_addi(pzprop prop, cstr_t key, int value)
+{ NUMBER_TO_STR("%d"); }
+
+ZPEXPORT bool zp_addf(pzprop prop, cstr_t key, float value)
+{ NUMBER_TO_STR("%f"); }
+
+ZPEXPORT bool zp_addd(pzprop prop, cstr_t key, double value)
+{ NUMBER_TO_STR("%f"); }
+
+ZPEXPORT bool zp_addul(pzprop prop, cstr_t key, uint32_t value)
+{ NUMBER_TO_STR("%u"); }
+
+ZPEXPORT bool zp_addull(pzprop prop, cstr_t key, uint64_t value)
+{ NUMBER_TO_STR("%llu"); }
+
+ZPEXPORT bool zp_addi64(pzprop prop, cstr_t key, int64_t value)
+{ NUMBER_TO_STR("%lld"); }
+
+ZPEXPORT bool zp_addld(pzprop prop, cstr_t key, ldouble_t value)
+{ NUMBER_TO_STR("%Lf"); }
+
+ZPEXPORT bool zp_addc(pzprop prop, cstr_t key, char value)
+{
+	if (value == '\0') {
+		return zp_add(prop, key, NULL);
+	} else {
+		char str[] = { value, '\0' };
+		return zp_add(prop, key, str);
+	}
+	return false;
+}
+
 ZPEXPORT size_t zp_size(pzprop prop)
 {
 	return (prop == NULL || prop->count == 0) ? 0 : prop->count / 2;
 }
-
-/***********************************************************************
- *
- * CONVERSIONES
- *
- **********************************************************************/
-
-ZPEXPORT int zp_int(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return atoi(value);
-	return 0; 
-}
-
-ZPEXPORT int64_t zp_int64(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return atoll(value);
-	return 0; 
-}
-
-ZPEXPORT double zp_double(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return atof(value);
-	return 0; 
-}
-
-ZPEXPORT long double zp_longdouble(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return strtold(value, NULL);
-	return 0;
-}
-
-ZPEXPORT unsigned long zp_ulong(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return strtoul(value, NULL, 10);
-	return 0;
-}
-
-ZPEXPORT uint64_t zp_uint64(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return strtoull(value, NULL, 10);
-	return 0;
-}
-
-ZPEXPORT bool zp_bool(pzprop prop, cstr_t key)
-{
-	cstr_t value = zp_value(prop, key);
-	if (value != NULL)
-		return strcmp(value, "true") == 0 || value[0] == '1';
-	return false;
-}
-
-/**********************************************************************/
 
 ZPEXPORT bool zp_write_a(pzprop prop, cstr_t filename)
 { return _zp_write(prop, filename, false); }
@@ -252,22 +292,30 @@ bool _zp_resolve_str(char **out, const char *in)
 	return false;
 }
 
+bool _zp_write_line(FILE *file, cstr_t key, cstr_t value)
+{
+	if (value == NULL) {
+		return fprintf(file, "%s=\n", key) >= 0;
+	} else {
+		char *value_c = NULL;
+		if (_zp_resolve_str(&value_c, value)) {
+			bool error = fprintf(file, "%s=%s\n", key, value_c) >= 0;
+			free(value_c);
+			return error;
+		}
+	}
+	return false;
+}
+
 bool _zp_write(pzprop prop, const void *filename, bool unicode)
 {
 	FILE *file;
 	if (prop != NULL && filename != NULL && (file = OPEN_FILE("w")) != NULL) {
 		for (size_t i = 1; i < prop->count; i += 2) {
-			char *val_c = NULL;
-			if (prop->data[i] != NULL && 
-				!_zp_resolve_str(&val_c, prop->data[i]))
-				break;
-			if (fprintf(file, "%s=%s\n", prop->data[i - 1], val_c) < 0) {
-				free(val_c);
+			if (!_zp_write_line(file, prop->data[i - 1], prop->data[i])) {
 				break;
 			}
-			free(val_c);
 		}
-
 		fclose(file);
 		return errno == 0;
 	}
@@ -332,7 +380,7 @@ void _zp_app_property(pzprop prop, cstr_t line, size_t len)
 			espace = false;
 		if (!_zp_append(&str, c))
 			break;
-		if (!cp_key && i + 1 < len) {
+		if (!cp_key && i + 1 == len) {
 			for (int j = (int)(str.count - 1); j >= 0; j--) {
 				if (!isblank(str.data[j]))
 					break;
@@ -447,7 +495,7 @@ bool _zp_add_value(pzprop prop, cstr_t value, bool is_value)
 			prop->data[prop->count - 1] = NULL;
 			return true;
 		} else {
-			char *value_c = _strdup(value);
+			char *value_c = strdup(value);
 			if (value_c != NULL) {
 				prop->data[prop->count - 1] = value_c;
 				if (is_value)
@@ -476,7 +524,7 @@ bool _zp_is_empty(cstr_t value)
 bool _zp_realloc(pzprop prop, int count_e)
 {
 	void *mem = realloc(prop->data,
-					   (prop->count + count_e) * sizeof(void *));
+					   (prop->count + count_e) * sizeof(void*));
 	if (mem != NULL || (prop->count + count_e) == 0) {
 		prop->data = (char **)mem;
 		prop->count += count_e;
