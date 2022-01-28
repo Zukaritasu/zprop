@@ -60,7 +60,7 @@ extern "C" {
 	} zpsize;
 
 #ifdef __ZPROP_LOCAL__
-	/* struct reservada para el developer */
+	/* reservada */
 	typedef struct zprop
 	{
 		size_t count;

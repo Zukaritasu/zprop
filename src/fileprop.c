@@ -58,22 +58,22 @@ typedef struct
 
 // ************************************************************************
 
-size_t _zp_indexof(pzprop prop, cstr_t key);
-bool   _zp_write(pzprop prop, const void *filename, bool unicode);
-bool   _zp_read(pzprop *prop, const void *filename, bool unicode);
-bool   _zp_realloc(pzprop prop, int count_e);
-bool   _zp_is_empty(cstr_t value);
-bool   _zp_read_line(STRING *line, FILE *file);
-bool   _zp_append(STRING *str, char c);
-void   _zp_app_property(pzprop prop, cstr_t kval, size_t cKval);
-bool   _zp_add_value(pzprop prop, cstr_t value, bool is_value);
-char*  _zp_convert(char *out, cstr_t in);
-bool   _zp_resolve_str(char **out, const char *in);
-bool   _zp_replace(pzprop prop, cstr_t key, cstr_t value);
-size_t _zp_str_length_control(const char *in);
-bool   _zp_substr_token(char* out, size_t begin, size_t end);
-bool   _zp_add_geometry(pzprop prop, cstr_t key, const long* g, size_t c);
-bool   _zp_value_geometry(pzprop prop, cstr_t key, long* g, size_t c);
+static size_t _zp_indexof(pzprop prop, cstr_t key);
+static bool   _zp_write(pzprop prop, const void *filename, bool unicode);
+static bool   _zp_read(pzprop *prop, const void *filename, bool unicode);
+static bool   _zp_realloc(pzprop prop, int count_e);
+static bool   _zp_is_empty(cstr_t value);
+static bool   _zp_read_line(STRING *line, FILE *file);
+static bool   _zp_append(STRING *str, char c);
+static void   _zp_app_property(pzprop prop, cstr_t kval, size_t cKval);
+static bool   _zp_add_value(pzprop prop, cstr_t value, bool is_value);
+static char*  _zp_convert(char *out, cstr_t in);
+static bool   _zp_resolve_str(char **out, const char *in);
+static bool   _zp_replace(pzprop prop, cstr_t key, cstr_t value);
+static size_t _zp_str_length_control(const char *in);
+static bool   _zp_substr_token(char* out, size_t begin, size_t end);
+static bool   _zp_add_geometry(pzprop prop, cstr_t key, const long* g, size_t c);
+static bool   _zp_value_geometry(pzprop prop, cstr_t key, long* g, size_t c);
 
 // ************************************************************************
 
@@ -184,7 +184,7 @@ ZPEXPORT bool zp_valuesz(pzprop prop, cstr_t key, zpsize* sz)
 		: false;
 }
 
-bool _zp_value_geometry(pzprop prop, cstr_t key, long* g, size_t c)
+static bool _zp_value_geometry(pzprop prop, cstr_t key, long* g, size_t c)
 {
 	memset(g, 0, sizeof(long) * c);
 	char* value = _strdup(zp_value(prop, key));
@@ -222,7 +222,7 @@ ZPEXPORT char zp_valuec(pzprop prop, cstr_t key)
 	return '\0';
 }
 
-bool _zp_replace(pzprop prop, cstr_t key, cstr_t value)
+static bool _zp_replace(pzprop prop, cstr_t key, cstr_t value)
 {
 	size_t i = _zp_indexof(prop, key);
 	if (i++ != UINT32_MAX) {
@@ -297,7 +297,7 @@ ZPEXPORT bool zp_addsz(pzprop prop, cstr_t key, const zpsize* sz)
 		: false;
 }
 
-bool _zp_add_geometry(pzprop prop, cstr_t key, const long* g, 
+static bool _zp_add_geometry(pzprop prop, cstr_t key, const long* g, 
 					  size_t c)
 {
 	char buf[260] = { 0 };
@@ -356,7 +356,7 @@ bool _zp_substr_token(char* out, size_t begin, size_t end)
 	return j != 0;
 }
 
-size_t _zp_str_length_control(const char *in)
+static size_t _zp_str_length_control(const char *in)
 {
 	size_t length = strlen(in);
 	for (size_t i = 0; in[i] != '\0'; i++) {
@@ -368,7 +368,7 @@ size_t _zp_str_length_control(const char *in)
 	return length;
 }
 
-bool _zp_resolve_str(char **out, const char *in)
+static bool _zp_resolve_str(char **out, const char *in)
 {
 	if (in != NULL && out != NULL) {
 		size_t len = strlen(in);
@@ -403,7 +403,7 @@ bool _zp_resolve_str(char **out, const char *in)
 	return false;
 }
 
-bool _zp_write_line(FILE *file, cstr_t key, cstr_t value)
+static bool _zp_write_line(FILE *file, cstr_t key, cstr_t value)
 {
 	if (value == NULL) {
 		fprintf(file, "%s=\n", key);
@@ -417,7 +417,7 @@ bool _zp_write_line(FILE *file, cstr_t key, cstr_t value)
 	return true;
 }
 
-bool _zp_write(pzprop prop, const void *filename, bool unicode)
+static bool _zp_write(pzprop prop, const void *filename, bool unicode)
 {
 	FILE *file;
 	if (prop != NULL && filename != NULL && 
@@ -434,7 +434,7 @@ bool _zp_write(pzprop prop, const void *filename, bool unicode)
 	return false;
 }
 
-bool _zp_read(pzprop *prop, const void *filename, bool unicode)
+static bool _zp_read(pzprop *prop, const void *filename, bool unicode)
 {
 	FILE *file;
 	if (prop != NULL && filename != NULL && 
@@ -462,7 +462,7 @@ bool _zp_read(pzprop *prop, const void *filename, bool unicode)
 	return false;
 }
 
-void _zp_app_property(pzprop prop, cstr_t line, size_t len)
+static void _zp_app_property(pzprop prop, cstr_t line, size_t len)
 {
 	bool espace = true;
 	bool cp_key = true;
@@ -516,11 +516,10 @@ void _zp_app_property(pzprop prop, cstr_t line, size_t len)
 	free(str.data);
 }
 
-bool _zp_append(STRING *str, char c)
+static bool _zp_append(STRING *str, char c)
 {
 	if (str->count == str->bytes) {
-		void *mem = realloc(str->data, str->bytes + 
-			STR_REALLOC_BYTES + (str->data == NULL ? 1 : 0));
+		void *mem = realloc(str->data, str->bytes + STR_REALLOC_BYTES + 1);
 		if (mem == NULL)
 			return false;
 		str->bytes += STR_REALLOC_BYTES;
@@ -532,7 +531,7 @@ bool _zp_append(STRING *str, char c)
 	return true;
 }
 
-size_t _zp_indexof(pzprop prop, cstr_t key)
+static size_t _zp_indexof(pzprop prop, cstr_t key)
 {
 	if (prop != NULL && key != NULL) {
 		for (size_t i = 0; i < prop->count; i += 2) {
@@ -544,7 +543,7 @@ size_t _zp_indexof(pzprop prop, cstr_t key)
 	return UINT32_MAX;
 }
 
-char *_zp_convert(char *out, cstr_t in)
+static char *_zp_convert(char *out, cstr_t in)
 {
 	size_t length;
 	if (out != NULL && in != NULL && (length = strlen(in)) > 0) {
@@ -566,7 +565,7 @@ char *_zp_convert(char *out, cstr_t in)
 	return out;
 }
 
-bool _zp_read_line(STRING *line, FILE *file)
+static bool _zp_read_line(STRING *line, FILE *file)
 {
 	int c;
 	bool begin = true;
@@ -601,7 +600,7 @@ bool _zp_read_line(STRING *line, FILE *file)
 	return c != EOF;
 }
 
-bool _zp_add_value(pzprop prop, cstr_t value, bool is_value)
+static bool _zp_add_value(pzprop prop, cstr_t value, bool is_value)
 {
 	if (_zp_realloc(prop, 1)) {
 		if (value == NULL) {
@@ -621,7 +620,7 @@ bool _zp_add_value(pzprop prop, cstr_t value, bool is_value)
 	return false;
 }
 
-bool _zp_is_empty(cstr_t value)
+static bool _zp_is_empty(cstr_t value)
 {
 	size_t length;
 	if ((length = strlen(value)) > 0) {
@@ -634,12 +633,12 @@ bool _zp_is_empty(cstr_t value)
 	return true;
 }
 
-bool _zp_realloc(pzprop prop, int count_e)
+static bool _zp_realloc(pzprop prop, int count_e)
 {
 	void *mem = realloc(prop->data,
 					   (prop->count + count_e) * sizeof(void*));
 	if (mem != NULL || (prop->count + count_e) == 0) {
-		prop->data = (char **)mem;
+		prop->data = (char**)mem;
 		prop->count += count_e;
 		return true;
 	}
